@@ -1,33 +1,49 @@
 // C++ File for main
 
-#include <stdlib.h>
 
-#include "sieve.h"
+#include "my_file_io_funcs.h"
 
 void usage( const char* prog_name ) {
    printf( "Usage: %s <max value>\n", prog_name );
    printf( "\n" );
 }
 
+
 int main( int argc, char** argv ) {
-   int val = 50;
-   if ( argc > 1 ) {
-      val = atoi(argv[1]);
-   } else {
-      printf( "ERROR: Missing argument for max value\n" );
-      usage( argv[0] );
-      exit( EXIT_FAILURE );
-   }
-   int num_primes = 0;
-   int* primes = ( int* )calloc( val, sizeof(int) );
+   std::string filename = "foo.bin";
+   bool debug = false;
+   int num_vals = 20;
+   long long file_size = 0;
+   float* write_vals = new float[ num_vals * sizeof( float ) ];
+   float* read_vals = new float[ num_vals * sizeof( float ) ];
+
+   gen_vals<float>( write_vals, 100, 0, num_vals );
+   printf( "Write Values:\n" );
+   printf_floats( write_vals, num_vals );
+
+   debug_printf( debug, "The input text file is %s\n", filename.c_str() ); 
+
+   write_binary_floats_file( write_vals, filename.c_str(), num_vals, debug );
+   check_file_size( file_size, filename.c_str(), debug ); 
+   read_binary_floats_file( read_vals, filename.c_str(), num_vals, debug ); 
    
-   printf( "Val is %d\n", val );
-   sieve( primes, &num_primes, val );
+   printf( "Read Values:\n" );
+   printf_floats( read_vals, num_vals );
 
-   for ( int index = 0; index < num_primes; index++ ) {
-      printf( "%d) %d\n", index, primes[index] );
+   int num_mismatches = 0;
+   if ( !compare_floats( read_vals, write_vals, num_vals ) ) {
+      printf( "ERROR: Values read from %s don't match values written\n",
+         filename.c_str() ); 
+      delete [] write_vals;
+      delete [] read_vals;
+      exit( EXIT_FAILURE );
+   } else {
+      printf( "All %d values read from %s matched the values written\n",
+         num_vals, filename.c_str() );
+      delete [] write_vals;
+      delete [] read_vals;
+      exit( EXIT_SUCCESS );
    }
-   printf( "\n" );
-
-   exit( EXIT_SUCCESS );
+   
 } 
+

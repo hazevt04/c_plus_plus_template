@@ -16,6 +16,18 @@
 #include <cstddef>
 #include <chrono>
 #include <string>
+#include <vector>
+
+
+#ifdef USE_COUT
+   template <class T>
+   void print_vals( const std::vector<T>& vals, const char* prefix = "" ) {
+      std::cout << prefix;
+      std::copy( std::begin(vals), std::end(vals),  std::ostream_iterator<T>(std::cout, "\n") );
+      std::cout << std::endl;
+   }
+#endif
+
 
 #define SWAP(a,b) { \
    (a) ^= (b); \
@@ -50,7 +62,7 @@ typedef std::chrono::duration<float, std::nano> Duration_ns;
 //printf( "CPU: Func() took %f milliseconds to process %d values\n", milliseconds, num_vals );
 
 template <class T>
-void gen_vals( T* vals, const T upper, const T lower, const int num_vals ) {
+void gen_vals( T* vals, const T lower, const T upper, const int num_vals ) {
   srand(time(NULL));
   T range = upper - lower + (T)1;
   for( int index = 0; index < num_vals; index++ ) {
@@ -58,11 +70,22 @@ void gen_vals( T* vals, const T upper, const T lower, const int num_vals ) {
   }
 }
 
+
+
 int free_these(void *arg1, ...); 
 void printf_floats( float* const vals, const int num_vals );
 void printf_ints( int* const vals, const int num_vals );
 void printf_uints( unsigned int* const vals, const int num_vals );
 void printf_ulongs( unsigned long* const vals, const int num_vals );
+
+inline bool compare_floats( float* const read_vals, float* const write_vals, int num_vals ) {
+   for( int index = 0; index < num_vals; index++ ) {
+      if ( read_vals[index] != write_vals[index] ) {
+         return false;
+      }
+   }
+   return true;
+}
 
 #define debug_printf( debug, fmt, ... ) { \
    if ( debug ) { \
@@ -70,12 +93,14 @@ void printf_ulongs( unsigned long* const vals, const int num_vals );
    } \
 }
 
+
 #define check_status( status, msg ) { \
    if ( status != SUCCESS ) { \
       printf( "%s(): ERROR: " #msg "\n", __func__ ); \
       exit(EXIT_FAILURE); \
    } \
 }
+
 
 #define try_new( type, ptr, num ) { \
    try { \
