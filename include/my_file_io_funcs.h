@@ -2,6 +2,7 @@
 #define __MY_FILE_IO_FUNCS_H__
 
 #include "utils.h"
+#include <sstream>
 #include <fstream>
 
 void write_binary_floats_file( float* vals, const char* filename, const int num_vals, const bool debug );
