@@ -2,6 +2,7 @@
 #define __MY_FILE_IO_FUNCS_H__
 
 #include "utils.h"
+#include <string.h>
 #include <sstream>
 #include <fstream>
 
