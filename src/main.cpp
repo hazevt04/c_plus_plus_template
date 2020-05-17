@@ -66,6 +66,10 @@ int main( int argc, char** argv ) {
          printf( "All %d values read from %s matched the values written\n", 
                num_vals, filename.c_str() );
       }
+
+      std::string foo_str = "foo";
+      double foo_double = 3.141592653589793238462f;
+      debug_cout( debug, "Testing debug_cout: num_vals is ", num_vals,", foo_str is ", foo_str, ", foo_double is ", foo_double );
       return EXIT_SUCCESS;
    
    } catch( std::exception& ex ) {

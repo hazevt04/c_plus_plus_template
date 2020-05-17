@@ -5,11 +5,8 @@
 #define FAILURE -2
 
 // printf is preferred over std::cout
-#ifdef USE_COUT
-#  include <iostream>
-#else
-#  include <cstdio>
-#endif
+#include <iostream>
+#include <cstdio>
 
 #include <stdarg.h>
 #include <cstdlib>
@@ -17,27 +14,73 @@
 #include <chrono>
 #include <string>
 #include <vector>
+#include <iterator>
 
+#include "VariadicToOutputStream.h"
 
-#ifdef USE_COUT
-   template <class T>
-   void print_vals( const std::vector<T>& vals, const char* prefix = "" ) {
-      std::cout << prefix;
-      std::copy( std::begin(vals), std::end(vals),  std::ostream_iterator<T>(std::cout, "\n") );
-      std::cout << std::endl;
+#ifndef check_status
+#  define check_status( status, msg ) { \
+      if ( status != SUCCESS ) { \
+         printf( "%s(): ERROR: " #msg "\n", __func__ ); \
+         exit(EXIT_FAILURE); \
+      } \
+   }
+#endif
+
+#ifndef try_new
+#  define try_new( type, ptr, num ) { \
+      try { \
+         ptr = new type[num]; \
+      } catch( const std::bad_alloc& error ) { \
+         printf( "%s(): ERROR: new of %d "\
+            "items for " #ptr " failed\n", __func__, num ); \
+         exit(EXIT_FAILURE); \
+      } \
    }
 #endif
 
 
-#define SWAP(a,b) { \
-   (a) ^= (b); \
-   (b) ^= (a); \
-   (a) ^= (b); \
-}
+#ifndef try_func
+#  define try_func(status, msg, func) { \
+      status = func; \
+      check_status( status, msg ); \
+   }
+#endif
 
-#define MAX(a,b) ((a) > (b)) ? (a) : (b);
 
-#define CEILING(a,b) ((a) + ((b)-1))/(b);
+#ifndef try_delete
+#  define try_delete( ptr ) { \
+     if (ptr) delete [] ptr; \
+   }
+#endif
+
+
+#ifndef debug_print
+#  define debug_printf( debug, fmt, ... ) { \
+      if ( debug ) { \
+         printf(fmt, ##__VA_ARGS__); \
+      } \
+   }
+#endif
+
+
+#ifndef SWAP
+#  define SWAP(a,b) { \
+      (a) ^= (b); \
+      (b) ^= (a); \
+      (a) ^= (b); \
+   }
+#endif
+
+
+#ifndef MAX
+#  define MAX(a,b) ((a) > (b)) ? (a) : (b);
+#endif
+
+
+#ifndef CEILING
+#  define CEILING(a,b) ((a) + ((b)-1))/(b);
+#endif
 
 // Hacker's Delight Second Edition pg 44 ('doz')
 // Only valid for signed integers, -2^30 < a,b <=(2^30)-1
@@ -58,8 +101,7 @@ typedef std::chrono::duration<float, std::nano> Duration_ns;
 //Time_Point start = Steady_Clock::now();
 //Timed code goes here
 //Duration_ms duration_ms = Steady_Clock::now() - start;
-//milliseconds = duration_ms.count();
-//printf( "CPU: Func() took %f milliseconds to process %d values\n", milliseconds, num_vals );
+//printf( "CPU: Func() took %f milliseconds to process %d values\n", duration_ms.count(), num_vals );
 
 template <class T>
 void gen_vals( T* vals, const T lower, const T upper, const int num_vals ) {
@@ -70,9 +112,13 @@ void gen_vals( T* vals, const T lower, const T upper, const int num_vals ) {
   }
 }
 
+template <class T>
+void print_vec( const std::vector<T>& vals, const char* prefix = "" ) {
+   std::cout << prefix;
+   std::copy( std::begin(vals), std::end(vals),  std::ostream_iterator<T>(std::cout, "\n") );
+   std::cout << std::endl;
+}
 
-
-int free_these(void *arg1, ...); 
 void printf_floats( float* const vals, const int num_vals );
 void printf_ints( int* const vals, const int num_vals );
 void printf_uints( unsigned int* const vals, const int num_vals );
@@ -87,40 +133,7 @@ inline bool compare_floats( float* const read_vals, float* const write_vals, int
    return true;
 }
 
-#define debug_printf( debug, fmt, ... ) { \
-   if ( debug ) { \
-      printf(fmt, ##__VA_ARGS__); \
-   } \
-}
+int free_these(void *arg1, ...); 
 
-
-#define check_status( status, msg ) { \
-   if ( status != SUCCESS ) { \
-      printf( "%s(): ERROR: " #msg "\n", __func__ ); \
-      exit(EXIT_FAILURE); \
-   } \
-}
-
-
-#define try_new( type, ptr, num ) { \
-   try { \
-      ptr = new type[num]; \
-   } catch( const std::bad_alloc& error ) { \
-      printf( "%s(): ERROR: new of %d "\
-         "items for " #ptr " failed\n", __func__, num ); \
-      exit(EXIT_FAILURE); \
-   } \
-}
-
-
-#define try_func(status, msg, func) { \
-  status = func; \
-  check_status( status, msg ); \
-}
-
-
-#define try_delete( ptr ) { \
-  if (ptr) delete [] ptr; \
-}
 
 #endif
