@@ -98,5 +98,48 @@ void read_binary_floats_file( float* vals, const char* filename, const int num_v
 }
 
 
+void test_my_file_io_funcs( std::string filename, const int num_vals, const bool inject_error, const bool debug ) {
+   try {
+      long long file_size = 0;
+
+      float* write_vals = new float[ num_vals * sizeof( float ) ];
+      float* read_vals = new float[ num_vals * sizeof( float ) ];
+      std::ostringstream err_msg_stream( std::ostringstream::ate );
+      
+      gen_vals<float>( write_vals, 100, 0, num_vals );
+      printf( "Write Values:\n" );
+      printf_floats( write_vals, num_vals );
+
+      debug_printf( debug, "The input text file is %s\n", filename.c_str() ); 
+
+      write_binary_floats_file( write_vals, filename.c_str(), num_vals, debug );
+
+      check_file_size( file_size, filename.c_str(), debug ); 
+
+      if ( inject_error ) {
+         filename = "wrong_file.bin";
+      }
+
+      read_binary_floats_file( read_vals, filename.c_str(), num_vals, debug ); 
+      
+      printf( "Read Values:\n" );
+      printf_floats( read_vals, num_vals );
+
+      int num_mismatches = 0;
+      if ( !compare_floats( read_vals, write_vals, num_vals ) ) {
+         err_msg_stream <<  "Values read from " << filename 
+            << " don't match values written";      
+         throw std::runtime_error( err_msg_stream.str() );
+      } else {
+         printf( "All %d values read from %s matched the values written\n", 
+               num_vals, filename.c_str() );
+      }
+
+   } catch ( std::exception& ex ) {
+      printf( "ERROR: %s\n", ex.what() ); 
+   }
+
+}
+
 
 // end of C++ file for my_file_io_funcs
