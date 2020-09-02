@@ -42,6 +42,10 @@ int main( int argc, char** argv ) {
 
       test_my_file_io_funcs( filename, num_vals, inject_error, debug );
       
+      int check_status = 1;
+      std::string check_status_str = decode_status(check_status);
+      debug_cout( true, "Check Status is ", check_status_str );
+
       return EXIT_SUCCESS;
    
    } catch( std::exception& ex ) {

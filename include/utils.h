@@ -135,5 +135,17 @@ inline bool compare_floats( float* const read_vals, float* const write_vals, int
 
 int free_these(void *arg1, ...); 
 
+// Example code, not actually meant to be directly used
+inline std::string decode_status( int status ) {
+   char const* status_strings[] = {
+      "This is status 0",
+      "This is status 1"};
+
+   if ( status < 2 ) {
+      return std::string(status_strings[status]);
+   }
+   return std::string("Unknown status value: " + 
+         std::to_string(status) + "\n");
+} 
 
 #endif
