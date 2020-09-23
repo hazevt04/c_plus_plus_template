@@ -1,36 +1,32 @@
 // C++ File for main
 
-#include "my_file_io_funcs.h"
+#include "my_file_io_funcs.hpp"
 
 void usage( const char* prog_name ) {
-   printf( "Usage: %s <num values> <-e/--error>\n", prog_name );
-   printf( "\n" );
+   std::cout << "Usage: " << std::string{prog_name}
+      << "<num values> <-e/--error>\n";
 }
 
 int main( int argc, char** argv ) {
-   std::string filename = "foo.bin";
-   bool debug = true;
-   int num_vals = 10;
-   bool inject_error = false;
-
-   std::ostringstream err_msg_stream( std::ostringstream::ate );
-
    try {
+      std::string filename = "foo.bin";
+      bool debug = true;
+      int num_vals = 10;
+      bool inject_error = false;
+      
       if ( argc > 2 ) {
-         debug_printf( debug, "argv[2] = %s\n", argv[2] ); 
+         debug_cout( debug, "argv[2] = ", std::string{argv[2]}, "\n" ); 
          if ( (!strcmp( argv[2], "-e" )) || (!strcmp( argv[2], "--error" ) ) ) {
             inject_error = true;
          } else {
-            err_msg_stream << "Invalid input: " << argv[2];
-            throw std::invalid_argument( err_msg_stream.str() );
+            throw std::invalid_argument{ std::string{"Invalid input: "} + std::string{argv[2]} };
          }
       } else if ( argc > 1 ) {
-         debug_printf( debug, "argv[1] = %s\n", argv[1] ); 
+         debug_cout( debug, "argv[1] = ", std::string{argv[1]}, "\n" ); 
          char* end_ptr = nullptr;
          num_vals = (int)strtoul( argv[1], &end_ptr, 10 );
          if  ( end_ptr == nullptr ) {
-            err_msg_stream << "Invalid input: " << argv[1];
-            throw std::invalid_argument( err_msg_stream.str() );
+            throw std::invalid_argument{ std::string{"Invalid input: "} + std::string{argv[1]} };
          }
       }
       
@@ -49,7 +45,7 @@ int main( int argc, char** argv ) {
       return EXIT_SUCCESS;
    
    } catch( std::exception& ex ) {
-      printf( "ERROR: %s\n", ex.what() ); 
+      std::cout << "ERROR: " << ex.what() << "\n"; 
       return EXIT_FAILURE;
    }
 }

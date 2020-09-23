@@ -1,5 +1,4 @@
-#ifndef _UTILS_H_
-#define _UTILS_H_
+#pragma once
 
 #define SUCCESS 0
 #define FAILURE -2
@@ -16,7 +15,7 @@
 #include <vector>
 #include <iterator>
 
-#include "VariadicToOutputStream.h"
+#include "VariadicToOutputStream.hpp"
 
 #ifndef check_status
 #  define check_status( status, msg ) { \
@@ -103,6 +102,16 @@ typedef std::chrono::duration<float, std::nano> Duration_ns;
 //Duration_ms duration_ms = Steady_Clock::now() - start;
 //printf( "CPU: Func() took %f milliseconds to process %d values\n", duration_ms.count(), num_vals );
 
+
+template <class T>
+void gen_vals( std::vector<T>& vals, const T lower, const T upper ) {
+  srand(time(NULL));
+  T range = upper - lower + (T)1;
+  for ( auto& val: vals ) {
+    val = (T)(rand() % (int)range) + lower;
+  }
+}
+
 template <class T>
 void gen_vals( T* vals, const T lower, const T upper, const int num_vals ) {
   srand(time(NULL));
@@ -113,11 +122,22 @@ void gen_vals( T* vals, const T lower, const T upper, const int num_vals ) {
 }
 
 template <class T>
-void print_vec( const std::vector<T>& vals, const char* prefix = "" ) {
+void print_vals( const std::vector<T>& vals, const char* prefix = "", const char* delim = " ", const char* suffix = "\n" ) {
    std::cout << prefix;
    std::copy( std::begin(vals), std::end(vals),  std::ostream_iterator<T>(std::cout, "\n") );
-   std::cout << std::endl;
+   std::cout << suffix;
 }
+
+template <class T>
+void print_vals( const T* vals, const int num_vals, const char* prefix = "", const char* delim = " ", const char* suffix = "\n" ) {
+   std::cout << prefix;
+   for( int index = 0; index < num_vals; ++index ) {
+      std::cout << vals[index] 
+         << ((index == num_vals - 1) ? "\n" : delim );
+   } 
+   std::cout << suffix;
+}
+
 
 void printf_floats( float* const vals, const int num_vals );
 void printf_ints( int* const vals, const int num_vals );
@@ -148,4 +168,3 @@ inline std::string decode_status( int status ) {
          std::to_string(status) + "\n");
 } 
 
-#endif
