@@ -37,7 +37,7 @@ MaxEmptyLinesToKeep: 2
 NamespaceIndentation: All
 PointerAlignment: Left
 SpacesInContainerLiterals: true
-SpacesInParentheses: true
-SpacesInSquareBrackets: true
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
 ...
 
