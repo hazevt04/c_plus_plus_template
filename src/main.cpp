@@ -6,6 +6,7 @@ void usage( const char* prog_name ) {
    std::cout << "Usage: " << std::string{prog_name} << "<num values> <-e/--error>\n";
 }
 
+
 int main( int argc, char** argv ) {
    try {
       std::string filename = "foo.bin";
@@ -52,3 +53,4 @@ int main( int argc, char** argv ) {
       return EXIT_FAILURE;
    }
 }
+

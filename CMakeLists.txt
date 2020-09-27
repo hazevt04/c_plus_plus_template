@@ -1,10 +1,8 @@
-cmake_minimum_required( VERSION 2.8.0 )
+cmake_minimum_required( VERSION 3.8.0 )
 
 project( foo LANGUAGES CXX )
 
 include_directories( "include" )
-
-#add_definitions( -std=c++11 )
 
 set(EXEC_NAME "${CMAKE_PROJECT_NAME}")
 
