@@ -217,21 +217,35 @@ std::pair<bool, int> mismatch_where(const std::vector<T>& lvals, const std::vect
    return std::pair<bool, int>{true, -1};
 }
 
-template<typename T>
-bool complex_vals_are_close( const std::complex<T>& lval, const std::complex<T>& rval, const T& max_diff ) {
-   T abs_diff_real = abs( lval.real() - rval.real() );
-   T abs_diff_imag = abs( lval.imag() - rval.imag() );
-
-   return ( ( abs_diff_real <= max_diff ) && ( abs_diff_imag <= max_diff ) );
-}
-
+// template<typename T>
+// bool complex_vals_are_close( const std::complex<T>& lval, const std::complex<T>& rval, const T& max_diff ) {
+   // T abs_diff_real = abs( lval.real() - rval.real() );
+   // T abs_diff_imag = abs( lval.imag() - rval.imag() );
+//
+   // return ( ( abs_diff_real <= max_diff ) && ( abs_diff_imag <= max_diff ) );
+// }
 
 template<typename T>
 using complex_vec = std::vector<std::complex<T>>;
 
 
 template<typename T>
-std::pair<bool,int> mismatch_where( const complex_vec<T>& lvals, const complex_vec<T>& rvals, const T& max_diff ) {
+bool complex_vals_are_close( const complex_vec<T>& lvals, const complex_vec<T>& rvals, const T& max_diff ) {
+
+   for( size_t index = 0; index != lvals.size(); ++index ) {
+      T abs_diff_real = abs( lvals[index].real() - rvals[index].real() );
+      T abs_diff_imag = abs( lvals[index].imag() - rvals[index].imag() );
+
+      if ( ( abs_diff_real > max_diff ) || ( abs_diff_imag > max_diff ) ) {
+         return false;
+      }
+   }
+   return true;
+}
+
+
+template<typename T>
+std::pair<bool,int> complex_mismatch_where( const complex_vec<T>& lvals, const complex_vec<T>& rvals, const T& max_diff ) {
 
    for( size_t index = 0; index != lvals.size(); ++index ) {
       T abs_diff_real = abs( lvals[index].real() - rvals[index].real() );
@@ -258,12 +272,11 @@ bool vals_are_close( const std::vector<T>& lvals, const std::vector<T>& rvals, c
    return true;
 }
 
-
 template<typename T>
 std::pair<bool,int> mismatch_where( const std::vector<T>& lvals, const std::vector<T>& rvals, const T& max_diff ) {
 
    for( size_t index = 0; index != lvals.size(); ++index ) {
-      T abs_diff = abs( lvals[index] - rvals[index] );
+      const T abs_diff = abs( lvals[index] - rvals[index] );
 
       if ( ( abs_diff > max_diff ) ) {
          return std::pair<bool,int>{false,index};

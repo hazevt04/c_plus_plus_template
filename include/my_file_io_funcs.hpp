@@ -94,7 +94,7 @@ void read_binary_file_inner(
                std::to_string(num_val_bytes) + std::string{" bytes, for file "} + filename +
                std::string{"."}};
          }
-         ifile.read(reinterpret_cast<char*>(vals), num_file_bytes);
+         ifile.read(reinterpret_cast<char*>(vals), num_val_bytes);
 
       } else {
          throw std::runtime_error{
@@ -116,13 +116,23 @@ void read_binary_file(
    }
 }
 
+template<typename T>
+void read_binary_file(
+   std::vector<T>& vals, const char* filename, const int num_vals_to_read, const bool debug = false) {
+
+   try {
+      read_binary_file_inner<T>( vals.data(), filename, num_vals_to_read, debug );
+   } catch (std::exception& ex) {
+      throw std::runtime_error{std::string{__func__} + std::string{"(): "} + ex.what()};
+   }
+}
 
 template<typename T>
 void read_binary_file(
    T* vals, const char* filename, const int num_vals, const bool debug = false) {
 
    try {
-      read_binary_file_inner<T>( vals.data(), filename, num_vals, debug );
+      read_binary_file_inner<T>( vals, filename, num_vals, debug );
    } catch (std::exception& ex) {
       throw std::runtime_error{std::string{__func__} + std::string{"(): "} + ex.what()};
    }
