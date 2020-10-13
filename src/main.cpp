@@ -25,7 +25,7 @@ int main( int argc, char** argv ) {
          debug_cout( debug, "argv[1] = ", std::string{argv[ 1 ]}, "\n" );
          char* end_ptr = nullptr;
          num_vals = (int)strtoul( argv[ 1 ], &end_ptr, 10 );
-         if ( end_ptr != nullptr ) {
+         if ( *end_ptr != '\0' ) {
             throw std::invalid_argument{std::string{"Invalid input: "} + std::string{argv[ 1 ]}};
          }
       }
