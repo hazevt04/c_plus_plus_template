@@ -20,6 +20,16 @@
 
 #include "VariadicToOutputStream.hpp"
 
+// From https://stackoverflow.com/questions/1562074/how-do-i-show-the-value-of-a-define-at-compile-time 
+// Also see: https://gcc.gnu.org/onlinedocs/cpp/Stringizing.html#Stringizing
+#define ENQUOTE(x) #x
+#define STRINGIFY(x) ENQUOTE(x)
+// usage example:
+// #define STR(x) #x
+// char *s1 = "abc";
+// char *s2 = STR(abc);
+// // s1 and s2 will have the same value
+
 #ifndef check_status
 #   define check_status(status, msg)                     \
       {                                                  \

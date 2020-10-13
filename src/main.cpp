@@ -1,5 +1,6 @@
 // C++ File for main
 
+#define MY_TEST_STRING 123
 #include "my_file_io_funcs.hpp"
 
 void usage( const char* prog_name ) {
@@ -13,6 +14,9 @@ int main( int argc, char** argv ) {
       bool debug = true;
       int num_vals = 10;
       bool inject_error = false;
+      
+      std::cout << "Testing the STRINGIFY macro: " STRINGIFY(MY_TEST_STRING);
+      std::cout << "\n"; 
 
       if ( argc > 2 ) {
          debug_cout( debug, "argv[2] = ", std::string{argv[ 2 ]}, "\n" );
