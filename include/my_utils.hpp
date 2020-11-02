@@ -14,21 +14,12 @@
 #include <string>
 #include <vector>
 #include <complex>
-#include <random>
 #include <algorithm>
+#include <random>
+#include <exception>
 #include <memory>
 
 #include "VariadicToOutputStream.hpp"
-
-// From https://stackoverflow.com/questions/1562074/how-do-i-show-the-value-of-a-define-at-compile-time 
-// Also see: https://gcc.gnu.org/onlinedocs/cpp/Stringizing.html#Stringizing
-#define ENQUOTE(x) #x
-#define STRINGIFY(x) ENQUOTE(x)
-// usage example:
-// #define STR(x) #x
-// char *s1 = "abc";
-// char *s2 = STR(abc);
-// // s1 and s2 will have the same value
 
 #ifndef check_status
 #   define check_status(status, msg)                     \
@@ -104,6 +95,12 @@
 #   define CEILING(a, b) ((a) + ((b)-1)) / (b);
 #endif
 
+// Already included in C++14
+template<typename T, typename... Args>
+std::unique_ptr<T> my_make_unique(Args&&... args) {
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+
 #ifndef dout
 #  define dout debug && std::cout
 #endif
@@ -139,14 +136,6 @@ void gen_vals(std::vector<T>& vals, const T lower, const T upper) {
    }
 }
 
-template <class T>
-void gen_vals(T* vals, const T lower, const T upper, const int num_vals) {
-   srand(time(NULL));
-   T range = upper - lower + (T)1;
-   for (int index = 0; index < num_vals; index++) {
-      vals[index] = (T)(rand() % (int)range) + lower;
-   }
-}
 template <class T>
 void gen_complex_vals(std::complex<T>& vals, const T lower, const T upper, const int num_vals) {
    srand(time(NULL));
@@ -187,6 +176,8 @@ void gen_reals( std::vector<RealType>& reals, const float lower, const float upp
    } 
 }
 
+#include <iomanip>
+
 template <class T>
 void print_vals(const std::vector<T>& vals,
    const char* prefix = "",
@@ -203,9 +194,8 @@ void print_vals(const T* vals,
    const char* prefix = "",
    const char* delim = " ",
    const char* suffix = "\n") {
-   std::cout << prefix;
    for (int index = 0; index < num_vals; ++index) {
-      std::cout << vals[index] << ((index == num_vals - 1) ? "\n" : delim);
+      std::cout << "\n" << prefix << "Index " << index << ": " << vals[index] << ((index == num_vals - 1) ? "\n" : delim);
    }
    std::cout << suffix;
 }
@@ -219,7 +209,7 @@ void print_vals(const T* vals,
    const char* suffix = "\n") {
    std::cout << prefix;
    for (int index = start_index; index < (start_index + num_vals); ++index) {
-      std::cout << vals[index] << ((index == num_vals - 1) ? "\n" : delim);
+      std::cout << prefix << vals[index] << ((index == num_vals - 1) ? "\n" : delim);
    }
    std::cout << suffix;
 }
@@ -240,6 +230,9 @@ template <typename T>
 std::pair<bool, int> mismatch_where(const T* lvals, const T* rvals, int num_vals) {
    for (int index = 0; index < num_vals; ++index) {
       if (lvals[index] != rvals[index]) {
+         std::cout << "Mismatch:\n";
+         std::cout << "Lval[" << index << "] = " << std::setprecision(9) << lvals[index] << "\n";
+         std::cout << "Rval[" << index << "] = " << std::setprecision(9) << rvals[index] << "\n";
          return std::pair<bool, int>{false,index};
       }
    }
@@ -251,6 +244,9 @@ template <typename T>
 bool compare_vals(const std::vector<T>& lvals, const std::vector<T>& rvals) {
    for (int index = 0; index < (int)lvals.size(); ++index) {
       if (lvals[index] != rvals[index]) {
+         std::cout << "Mismatch:\n";
+         std::cout << "Lval[" << index << "] = " << std::setprecision(9) << lvals[index] << "\n";
+         std::cout << "Rval[" << index << "] = " << std::setprecision(9) << rvals[index] << "\n";
          return false;
       }
    }
@@ -262,19 +258,14 @@ template <typename T>
 std::pair<bool, int> mismatch_where(const std::vector<T>& lvals, const std::vector<T>& rvals) {
    for (int index = 0; index < (int)lvals.size(); ++index) {
       if (lvals[index] != rvals[index]) {
+         std::cout << "Mismatch:\n";
+         std::cout << "Lval[" << index << "] = " << std::setprecision(9)<< lvals[index] << "\n";
+         std::cout << "Rval[" << index << "] = " << std::setprecision(9) << rvals[index] << "\n";
          return std::pair<bool, int>{false,index};
       }
    }
    return std::pair<bool, int>{true, -1};
 }
-
-// template<typename T>
-// bool complex_vals_are_close( const std::complex<T>& lval, const std::complex<T>& rval, const T& max_diff ) {
-   // T abs_diff_real = abs( lval.real() - rval.real() );
-   // T abs_diff_imag = abs( lval.imag() - rval.imag() );
-//
-   // return ( ( abs_diff_real <= max_diff ) && ( abs_diff_imag <= max_diff ) );
-// }
 
 template<typename T>
 using complex_vec = std::vector<std::complex<T>>;
@@ -288,6 +279,11 @@ bool complex_vals_are_close( const complex_vec<T>& lvals, const complex_vec<T>& 
       T abs_diff_imag = abs( lvals[index].imag() - rvals[index].imag() );
 
       if ( ( abs_diff_real > max_diff ) || ( abs_diff_imag > max_diff ) ) {
+         std::cout << "Mismatch:\n";
+         std::cout << "Lval[" << index << "] = {" << lvals[index] << "}\n";
+         std::cout << "Rval[" << index << "] = {" << rvals[index] << "}\n";
+         std::cout << "Difference = {" << abs_diff_real << ", " << abs_diff_imag << "}\n";
+         std::cout << "Max Difference = " << max_diff << "\n";
          return false;
       }
    }
@@ -303,6 +299,11 @@ std::pair<bool,int> complex_mismatch_where( const complex_vec<T>& lvals, const c
       T abs_diff_imag = abs( lvals[index].imag() - rvals[index].imag() );
 
       if ( ( abs_diff_real > max_diff ) || ( abs_diff_imag > max_diff ) ) {
+         std::cout << "Mismatch:\n";
+         std::cout << "Lval[" << index << "] = {" << lvals[index] << "}\n";
+         std::cout << "Rval[" << index << "] = {" << rvals[index] << "}\n";
+         std::cout << "Difference = {" << abs_diff_real << ", " << abs_diff_imag << "}\n";
+         std::cout << "Max Difference = " << max_diff << "\n";
          return std::pair<bool,int>{false,index};
       }
    }
@@ -317,6 +318,30 @@ bool vals_are_close( const std::vector<T>& lvals, const std::vector<T>& rvals, c
       T abs_diff = abs( lvals[index] - rvals[index] );
 
       if ( ( abs_diff > max_diff ) ) {
+         std::cout << "Mismatch:\n";
+         std::cout << "Lval[" << index << "] = " << std::setprecision(9) << lvals[index] << "\n";
+         std::cout << "Rval[" << index << "] = " << std::setprecision(9) << rvals[index] << "\n";
+         std::cout << "Difference = " << abs_diff << "\n";
+         std::cout << "Max Difference = " << max_diff << "\n";
+         return false;
+      }
+   }
+   return true;
+}
+
+
+template<typename T>
+bool vals_are_close( const T* lvals, const T* rvals, const int num_vals, const T& max_diff, const bool debug ) {
+
+   for( int index = 0; index < num_vals; ++index ) {
+      T abs_diff = abs( lvals[index] - rvals[index] );
+
+      if ( ( abs_diff > max_diff ) ) {
+         std::cout << "Mismatch:\n";
+         std::cout << "Lval[" << index << "] = " << std::setprecision(9) << lvals[index] << "\n";
+         std::cout << "Rval[" << index << "] = " << std::setprecision(9) << rvals[index] << "\n";
+         std::cout << "Difference = " << abs_diff << "\n";
+         std::cout << "Max Difference = " << max_diff << "\n";
          return false;
       }
    }
@@ -324,12 +349,36 @@ bool vals_are_close( const std::vector<T>& lvals, const std::vector<T>& rvals, c
 }
 
 template<typename T>
-std::pair<bool,int> mismatch_where( const std::vector<T>& lvals, const std::vector<T>& rvals, const T& max_diff ) {
+std::pair<bool,int> mismatch_where( const std::vector<T>& lvals, const std::vector<T>& rvals, const T& max_diff, const bool debug ) {
 
    for( size_t index = 0; index != lvals.size(); ++index ) {
       const T abs_diff = abs( lvals[index] - rvals[index] );
 
       if ( ( abs_diff > max_diff ) ) {
+         std::cout << "Mismatch:\n";
+         std::cout << "Lval[" << index << "] = " << std::setprecision(9) << lvals[index] << "\n";
+         std::cout << "Rval[" << index << "] = " << std::setprecision(9) << rvals[index] << "\n";
+         std::cout << "Difference = " << abs_diff << "\n";
+         std::cout << "Max Difference = " << max_diff << "\n";
+         return std::pair<bool,int>{false,index};
+      }
+   }
+   return std::pair<bool,int>{true,-1};
+}
+
+
+template<typename T>
+std::pair<bool,int> mismatch_where( const T* lvals, const T* rvals, const int num_vals, const T& max_diff, const bool debug ) {
+
+   for( int index = 0; index < num_vals; ++index ) {
+      T abs_diff = abs( lvals[index] - rvals[index] );
+
+      if ( ( abs_diff > max_diff ) ) {
+         dout << "Mismatch:\n";
+         dout << "Lval[" << index << "] = " << std::setprecision(9) << lvals[index] << "\n";
+         dout << "Rval[" << index << "] = " << std::setprecision(9) << rvals[index] << "\n";
+         dout << "Difference = " << std::setprecision(9) << abs_diff << "\n";
+         dout << "Max Difference = " << std::setprecision(9) << max_diff << "\n";
          return std::pair<bool,int>{false,index};
       }
    }
