@@ -15,9 +15,6 @@ int main( int argc, char** argv ) {
       int num_vals = 10;
       bool inject_error = false;
       
-      std::cout << "Testing the STRINGIFY macro: " STRINGIFY(MY_TEST_STRING);
-      std::cout << "\n"; 
-
       if ( argc > 2 ) {
          debug_cout( debug, "argv[2] = ", std::string{argv[ 2 ]}, "\n" );
          if ( ( !strcmp( argv[ 2 ], "-e" ) ) || ( !strcmp( argv[ 2 ], "--error" ) ) ) {
