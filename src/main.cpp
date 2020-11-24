@@ -47,6 +47,20 @@ int main( int argc, char** argv ) {
       std::string check_status_str = decode_status( check_status );
       debug_cout( true, "Check Status is ", check_status_str );
 
+
+      std::string test_split_str = "My Name is Glenn";
+      std::vector<std::string> split_strings;
+
+      std::cout << "Test Split string is '" << test_split_str << "'\n"; 
+      my_string_splitter( split_strings, test_split_str, " ", true );
+
+      
+      std::cout << "Result of my_string_splitter is\n"; 
+      for( auto str: split_strings ) {
+         std::cout << "'" << str << "'\n";
+      }
+      std::cout << "\n"; 
+
       return EXIT_SUCCESS;
 
    } catch ( std::exception& ex ) {
