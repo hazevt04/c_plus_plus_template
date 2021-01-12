@@ -7,6 +7,16 @@ void usage( const char* prog_name ) {
    std::cout << "Usage: " << std::string{prog_name} << "<num values> <-e/--error>\n";
 }
 
+void test_ilog2( const int& val ) {
+   std::cout << "Integer Log2(" << val << ") is " << ilog2( val ) << "\n\n"; 
+}
+
+
+void test_is_divisible_by( const int& val, const int& div ) {
+   if ( is_divisible_by( val, div ) ) {
+      std::cout << val << " is divisible by " << div << "\n\n"; 
+   }
+}
 
 int main( int argc, char** argv ) {
    try {
@@ -60,6 +70,12 @@ int main( int argc, char** argv ) {
          std::cout << "'" << str << "'\n";
       }
       std::cout << "\n"; 
+
+      int val = 8;
+      int div = 4;
+
+      test_ilog2( val );
+      test_is_divisible_by( val, div );
 
       return EXIT_SUCCESS;
 
