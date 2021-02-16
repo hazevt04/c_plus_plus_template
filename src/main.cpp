@@ -1,7 +1,10 @@
 // C++ File for main
 
 #define MY_TEST_STRING 123
+
 #include "my_file_io_funcs.hpp"
+
+#include "my_utils.hpp"
 
 void usage( const char* prog_name ) {
    std::cout << "Usage: " << std::string{prog_name} << "<num values> <-e/--error>\n";
