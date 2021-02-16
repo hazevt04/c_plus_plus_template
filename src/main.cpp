@@ -16,14 +16,14 @@ int main( int argc, char** argv ) {
       bool inject_error = false;
       
       if ( argc > 2 ) {
-         debug_cout( debug, "argv[2] = ", std::string{argv[ 2 ]}, "\n" );
+         dout << "argv[2] = " << std::string{argv[ 2 ]} << "\n";
          if ( ( !strcmp( argv[ 2 ], "-e" ) ) || ( !strcmp( argv[ 2 ], "--error" ) ) ) {
             inject_error = true;
          } else {
             throw std::invalid_argument{std::string{"Invalid input: "} + std::string{argv[ 2 ]}};
          }
       } else if ( argc > 1 ) {
-         debug_cout( debug, "argv[1] = ", std::string{argv[ 1 ]}, "\n" );
+         dout << "argv[1] = " << std::string{argv[ 1 ]} << "\n";
          char* end_ptr = nullptr;
          num_vals = (int)strtoul( argv[ 1 ], &end_ptr, 10 );
          if ( *end_ptr != '\0' ) {
@@ -33,20 +33,35 @@ int main( int argc, char** argv ) {
 
       std::string foo_str = "foo";
       double foo_double = 3.141592653589793238462f;
-      debug_cout( debug,
-         "Testing debug_cout: num_vals is ",
-         num_vals,
-         ", foo_str is ",
-         foo_str,
-         ", foo_double is ",
-         foo_double );
+      dout << "Testing debug_cout: num_vals is "
+         << num_vals
+         << ", foo_str is "
+         << foo_str
+         << ", foo_double is "
+         << foo_double;
 
       test_my_file_io_funcs( filename, num_vals, inject_error, debug );
 
       int check_status = 1;
       std::string check_status_str = decode_status( check_status );
-      debug_cout( true, "Check Status is ", check_status_str );
+      std::cout << "Check Status is " << check_status_str;
 
+      std::string test_string = "Split me up.";
+      auto split_strings = split_string( test_string, " " );
+      dout << "Test string is " << test_string << "\n";
+      for ( auto split_string: split_strings ) {
+         dout << "'" << split_string << "'\n";
+      }
+      dout << "\n\n";
+
+      test_string = "/home/user/path/to/split/up";
+      split_strings = split_string( test_string, "/" );
+      dout << "Test string is " << test_string << "\n";
+      for ( auto split_string: split_strings ) {
+         dout << "'" << split_string << "'\n";
+      }
+      dout << "\n\n";
+      
       return EXIT_SUCCESS;
 
    } catch ( std::exception& ex ) {

@@ -399,3 +399,10 @@ inline std::string decode_status(int status) {
 }
 
 
+// From stack overflow:
+// https://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c
+// for string delimiter
+std::vector<std::string> split_string(std::string str, std::string delimiter);
+
+
+

@@ -18,4 +18,21 @@ int free_these(void *arg1, ...) {
     return SUCCESS;
 }
 
+std::vector<std::string> split_string(std::string str, std::string delimiter=" ") {
+   size_t pos_start = 0;
+   size_t pos_end = 0; 
+   size_t delim_len = delimiter.length();
+   std::string token;
+   std::vector<std::string> split_strings;
+
+   while ( (pos_end = str.find(delimiter, pos_start) ) != std::string::npos ) {
+      token = str.substr(pos_start, pos_end - pos_start);
+      pos_start = pos_end + delim_len;
+      split_strings.push_back(token);
+   }
+
+   split_strings.push_back(str.substr(pos_start));
+   return split_strings;
+}
+
 // end of C++ file for utils
