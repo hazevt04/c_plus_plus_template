@@ -7,6 +7,29 @@ void usage( const char* prog_name ) {
    std::cout << "Usage: " << std::string{prog_name} << "<num values> <-e/--error>\n";
 }
 
+void test_my_popcount( const int& val ) {
+   std::cout << "(My) popcount(" << val << ") is " << my_popcount( val ) << "\n\n"; 
+}
+
+void test_my_count_leading_zeros( const int& val ) {
+   std::cout << "(My) count_leading_zeros(" << val << ") is " << my_count_leading_zeros( val ) << "\n\n"; 
+}
+
+void test_ilog2( const int& val ) {
+   std::cout << "Integer Log2(" << val << ") is " << ilog2( val ) << "\n\n"; 
+}
+
+void test_my_ilog2( const int& val ) {
+   std::cout << "(My) Integer Log2(" << val << ") is " << my_ilog2( val ) << "\n\n"; 
+}
+
+void test_is_divisible_by( const int& val, const int& div ) {
+   if ( is_divisible_by( val, div ) ) {
+      std::cout << val << " is divisible by " << div << "\n\n"; 
+   } else {
+      std::cout << val << " is NOT divisible by " << div << "\n\n"; 
+   }
+}
 
 int main( int argc, char** argv ) {
    try {
@@ -62,6 +85,23 @@ int main( int argc, char** argv ) {
       }
       dout << "\n\n";
       
+      int val = 8;
+      int val2 = ((1u<<21)-1);
+      int div = 4;
+
+      test_my_popcount( val );
+      test_my_count_leading_zeros( val );
+      test_my_ilog2( val );
+      test_ilog2( val );
+      test_is_divisible_by( val, div );
+
+      test_my_popcount( val2 );
+      test_my_count_leading_zeros( val2 );
+      test_my_ilog2( val2 );
+      test_ilog2( val2 );
+      test_is_divisible_by( val2, div );
+      std::cout << "Done\n"; 
+         
       return EXIT_SUCCESS;
 
    } catch ( std::exception& ex ) {
