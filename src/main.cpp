@@ -6,6 +6,8 @@
 
 #include "my_utils.hpp"
 
+#include "my_dir_utils.hpp"
+
 void usage( const char* prog_name ) {
    std::cout << "Usage: " << std::string{prog_name} << "<num values> <-e/--error>\n";
 }
@@ -33,6 +35,41 @@ void test_is_divisible_by( const int& val, const int& div ) {
       std::cout << val << " is NOT divisible by " << div << "\n\n"; 
    }
 }
+
+#include <unistd.h>
+
+void test_make_directories( std::vector<std::string>& filenames, 
+   const std::string& filename_base,
+   const int& num_subdirs,
+   const int& files_per_dir,
+   const bool& debug ) {
+   try {
+      char cwd[1024];
+
+      if ( getcwd(cwd, sizeof(cwd)) ) {
+         std::string dir_basename = std::string{cwd} + "/top_test_dir/dir_base_";
+         for( int dindex = 0; dindex < num_subdirs; ++dindex ) {
+            std::string t_dir = dir_basename + std::to_string(dindex) + "/";
+            dout << "t_dir is " << t_dir << std::endl;
+            if ( !mkpath( t_dir ) ) {
+               break;
+            }
+            for( int findex = 0; findex < files_per_dir; ++findex ) {
+               std::string t_filename = t_dir + filename_base + std::to_string(findex) + ".bin";
+               filenames.push_back( t_filename );
+            } 
+            
+
+         } // end of for( int index = 0; index < num_subdirs; ++index ) {
+      } else {
+         dout << "Unable to get current working directory\n";
+      } // end of if ( getcwd(cwd, sizeof(cwd)) ) {
+   } catch( std::exception& ex ) {
+      throw std::runtime_error( std::string{__func__} + "(): " + ex.what() );
+   }
+
+}
+
 
 int main( int argc, char** argv ) {
    try {
@@ -105,6 +142,16 @@ int main( int argc, char** argv ) {
       test_is_divisible_by( val2, div );
       std::cout << "Done\n"; 
          
+      std::vector<std::string> filenames;
+      std::string filename_base = "some_floats_";
+      int num_subdirs = 5;
+      int files_per_dir = 3;
+      test_make_directories( filenames, filename_base, num_subdirs, files_per_dir, debug );
+      std::cout << "Filenames\n"; 
+      for( const auto& filename: filenames ) {
+         std::cout << filename << "\n"; 
+      }
+      std::cout << "\n"; 
       return EXIT_SUCCESS;
 
    } catch ( std::exception& ex ) {
