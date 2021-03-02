@@ -101,7 +101,7 @@ int main( int argc, char** argv ) {
          << ", foo_str is "
          << foo_str
          << ", foo_double is "
-         << foo_double;
+         << foo_double << "\n";
 
       test_my_file_io_funcs( filename, num_vals, inject_error, debug );
 

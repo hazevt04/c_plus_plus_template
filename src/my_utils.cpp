@@ -15,6 +15,43 @@ int my_popcount(unsigned int x) {
 }
 
 
+// In case of no __builtin_clz() and no __builtin_popcount()
+int my_count_leading_zeros(unsigned int x) {
+   x = x | ( x >> 1 );
+   x = x | ( x >> 2 );
+   x = x | ( x >> 4 );
+   x = x | ( x >> 8 );
+   x = x | ( x >> 16 );
+   return my_popcount(~x);
+}
+ 
+// In case of no __builtin_clz() and no __builtin_popcount()
+int my_ilog2(unsigned int x) {
+   x = x | ( x >> 1 );
+   x = x | ( x >> 2 );
+   x = x | ( x >> 4 );
+   x = x | ( x >> 8 );
+   x = x | ( x >> 16 );
+   return (my_popcount(x) - 1);
+}
+
+
+int my_modulus( const unsigned int& val, const unsigned int& div ) {
+   if ( div > 0 ) {
+      // Only use mod (%) if we really HAVE to...
+      if ( is_power_of_two( div ) ) {
+         unsigned int mask = (1 << (ilog2( div ))) - 1;
+         return ( val & mask );
+      } else {
+         return ( val % div );
+      }
+   } else {
+      return 0;
+   }
+}
+
+
+
 // From stack overflow:
 // https://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c
 // for string delimiter
@@ -37,50 +74,20 @@ std::vector<std::string> split_string(std::string str, const std::string& delimi
 
 
 // variadic free function!
-int free_these(void *arg1, ...) {
+void free_these(void* arg1, ...) {
    va_list args;
-   void *vp;
-   if ( arg1 ) free(arg1);
-   va_start(args, arg1);
-   while ((vp = va_arg(args, void *)) != 0)
-      if ( vp ) free(vp);
-   va_end(args);
-   return SUCCESS;
-}
-
-
-// In case of no __builtin_clz() and no __builtin_popcount()
-int my_count_leading_zeros(unsigned int x) {
-   x = x | ( x >> 1 );
-   x = x | ( x >> 2 );
-   x = x | ( x >> 4 );
-   x = x | ( x >> 8 );
-   x = x | ( x >> 16 );
-   return my_popcount(~x);
-}
- 
-// In case of no __builtin_clz() and no __builtin_popcount()
-int my_ilog2(unsigned int x) {
-   x = x | ( x >> 1 );
-   x = x | ( x >> 2 );
-   x = x | ( x >> 4 );
-   x = x | ( x >> 8 );
-   x = x | ( x >> 16 );
-   return (my_popcount(x) - 1);
-}
-
-bool is_divisible_by( const unsigned int& val, const unsigned int& div ) {
-   if ( div > 0 ) {
-      // Only use mod (%) if we really HAVE to...
-      if ( is_power_of_two( div ) ) {
-         unsigned int mask = (1 << (ilog2( div ))) - 1;
-         return ( 0 == ( val & mask ) );
-      } else {
-         return ( 0 == ( val % div ) );
-      }
-   } else {
-      return false;
+   void* vp = nullptr;
+   if ( arg1 ) {
+      free(arg1);
+      arg1 = nullptr;
    }
+   va_start(args, arg1);
+   while ((vp = va_arg(args, void *)) != 0) {
+      if ( vp ) {
+         free(vp);
+         vp = nullptr;
+      }
+   }
+   va_end(args);
 }
-
 // end of C++ file for utils
